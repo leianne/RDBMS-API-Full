@@ -57,6 +57,22 @@ router.get('/:id', async (req, res) => {
     }
 })
 
+router.get('/:id/students', async (req, res) => {
+    const id = req.params.id;
+    try{
+        const students = await db('students').where({ cohort_id: id})
+        if(students.length > 0) {
+            res.status(200).json(students)
+        } else {
+            res.status(400).json({message: "There are no students in this cohort"})
+        }
+    }
+    catch(error){
+        res.status(500).json({message: 'We are working on fixing this issue!'})
+
+    }
+})
+
 // UPDATE in CRUD
 router.put('/:id', async (req, res) => {
     const updates = req.body;
