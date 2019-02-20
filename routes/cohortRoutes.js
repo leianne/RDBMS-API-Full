@@ -4,6 +4,7 @@ const knexConfig = require('../knexfile');
 const router = express();
 const db = knex(knexConfig.development)
 
+// MIDDLEWARE
 const checkNewCohort = (req, res, next) => {
     if(req.body.name) {
         next();
@@ -11,6 +12,20 @@ const checkNewCohort = (req, res, next) => {
         res.status(404).json('Please add a name for the cohort!')
     }
 }
+
+// CREATE in CRUD
+router.post('/', checkNewCohort, async (req, res) => {
+    const cohort = req.body;
+    try{
+        const newCohort = await db('cohorts').insert(cohort);
+        res.status(201).json({message: "cohort created!"})
+    }
+    catch(error){
+        res.status(500).json({message: 'We are working on fixing this issue!'})
+    }
+})
+
+// READ in CRUD 
 router.get('/', async (req, res) => {
     try{
         const cohorts = await db('cohorts');
@@ -41,17 +56,39 @@ router.get('/:id', async (req, res) => {
         res.status(500).json({message: 'We are working on fixing this issue!'})
     }
 })
-router.post('/', checkNewCohort, async (req, res) => {
-    const cohort = req.body;
+
+// UPDATE in CRUD
+router.put('/:id', async (req, res) => {
+    const updates = req.body;
+    const id = req.params.id;
     try{
-        const newCohort = await db('cohorts').insert(cohort);
-        res.status(201).json({message: "cohort created!"})
+        const updated = await db('cohorts').update(updates).where({ id })
+        if(updated){
+            res.status(202).json({message: 'Cohort updated!'})
+        } else {
+            res.status(404).json({message: 'We cant find that cohort. PLease try again'})
+        }
+    }
+    catch(error){
+        res.status(500).json({message: 'We are working on fixing this issue!'})
+
+    }
+})
+
+// DELETE in CRUD 
+router.delete('/:id', async (req, res) => {
+    const id = req.params.id;
+    try{
+        const deleted = await db('cohorts').where({ id }).del()
+        if(deleted){
+            res.status(204).json(deleted)
+        } else {
+            res.status(404).json({message: 'We cant find that cohort. PLease try again'})
+        }
     }
     catch(error){
         res.status(500).json({message: 'We are working on fixing this issue!'})
     }
 })
-
-
 
 module.exports = router;
