@@ -71,10 +71,30 @@ router.put('/:id', async (req, res) => {
     const updates = req.body;
     try{
         const updatedStudent = await db('students').update(updates).where({id})
-        console.log(updatedStudent)
+        if(updatedStudent){
+            res.status(202).json({message: "student updated"})
+        } else {
+            res.status(404).json({message: "we cant find that student!"})
+        }
     }
     catch(error){
+        res.status(500).json({message: 'We are working on fixing this issue!'})
+    }
+})
 
+// DELETE in CRUD
+router.delete('/:id', async (req, res) => {
+    const id = req.params.id;
+    try{
+        const deletedStudent = await db('students').where({id}).del()
+        if(deletedStudent){
+            res.status(204).json(deletedStudent)
+        } else {
+            res.status(404).json({message: 'we cannot find that student'})
+        }
+    }
+    catch(error){
+        res.status(500).json({message: 'We are working on fixing this issue!'})
     }
 })
 
