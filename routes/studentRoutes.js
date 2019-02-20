@@ -65,5 +65,17 @@ router.get('/:id', async (req, res) => {
     }
 })
 
+// UPDATE in CRUD 
+router.put('/:id', async (req, res) => {
+    const id = req.params.id;
+    const updates = req.body;
+    try{
+        const updatedStudent = await db('students').update(updates).where({id})
+        console.log(updatedStudent)
+    }
+    catch(error){
+
+    }
+})
 
 module.exports = router;
